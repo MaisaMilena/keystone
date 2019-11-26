@@ -30,7 +30,7 @@ test('Mongoose adapter exists', () => {
 });
 
 adapterRunners.forEach(({ runner, adapterName }) =>
-  describe.skip(`${adapterName} Data Storage`, () => {
+  describe(`${adapterName} Data Storage`, () => {
     test(
       'to-many relationship must be stored as empty array',
       runner(setupKeystone, async ({ keystone, findById }) => {

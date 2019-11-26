@@ -267,7 +267,9 @@ class KnexListAdapter extends BaseListAdapter {
     // delete it from any other item;
     await Promise.all(
       Object.entries(realData)
-        .filter(([key]) => this.fieldAdaptersByPath[key].isRelationship)
+        .filter(
+          ([key]) => this.fieldAdaptersByPath[key] && this.fieldAdaptersByPath[key].isRelationship
+        )
         .map(([key, value]) => ({ value, rel: this.fieldAdaptersByPath[key].rel }))
         .filter(
           ({ value, rel }) =>
