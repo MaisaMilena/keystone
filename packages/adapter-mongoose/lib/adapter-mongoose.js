@@ -59,7 +59,8 @@ class MongooseAdapter extends BaseKeystoneAdapter {
       ...mongooseConfig,
     });
   }
-  async postConnect() {
+
+  async postConnect({ keystone }) {
     return await pSettle(
       Object.values(this.listAdapters).map(listAdapter => listAdapter.postConnect())
     );
@@ -174,15 +175,13 @@ class MongooseListAdapter extends BaseListAdapter {
     return this.model.syncIndexes();
   }
 
-  _create(data) {
+  ////////// Mutations //////////
+
+  async _create(data) {
     return this.model.create(data);
   }
 
-  _delete(id) {
-    return this.model.findByIdAndRemove(id);
-  }
-
-  _update(id, data) {
+  async _update(id, data) {
     // Avoid any kind of injection attack by explicitly doing a `$set` operation
     // Return the modified item, not the original
     return this.model.findByIdAndUpdate(
@@ -192,12 +191,17 @@ class MongooseListAdapter extends BaseListAdapter {
     );
   }
 
-  _findAll() {
-    return this.model.find();
+  async _delete(id) {
+    return this.model.findByIdAndRemove(id);
   }
 
+  ////////// Queries //////////
   _findById(id) {
     return this.model.findById(id);
+  }
+
+  _findAll() {
+    return this.model.find();
   }
 
   _find(condition) {

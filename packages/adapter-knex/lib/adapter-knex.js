@@ -1,8 +1,5 @@
 const knex = require('knex');
 const pSettle = require('p-settle');
-const { BaseKeystoneAdapter, BaseListAdapter, BaseFieldAdapter } = require('@keystonejs/keystone');
-const logger = require('@keystonejs/logger').logger('knex');
-
 const {
   escapeRegExp,
   pick,
@@ -11,6 +8,9 @@ const {
   resolveAllKeys,
   identity,
 } = require('@keystonejs/utils');
+
+const { BaseKeystoneAdapter, BaseListAdapter, BaseFieldAdapter } = require('@keystonejs/keystone');
+const logger = require('@keystonejs/logger').logger('knex');
 const slugify = require('@sindresorhus/slugify');
 
 class KnexAdapter extends BaseKeystoneAdapter {
