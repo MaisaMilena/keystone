@@ -178,37 +178,64 @@ class MongooseListAdapter extends BaseListAdapter {
   ////////// Mutations //////////
 
   async _create(data) {
-    return this.model.create(data);
+    const realData = data;
+
+    // Unset any real 1:1 fields
+
+    // Insert the real data into the table
+    const item = await this.model.create(realData);
+
+    // For every non-real-field, update the corresponding FK/join table.
+    const manyItem = {};
+
+    // This currently over-populates the returned item.
+    // We should only be populating non-many fields, but the non-real-fields are generally many,
+    // which we want to ignore, with the exception of 1:1 fields with the FK on the other table,
+    // which we want to actually keep!
+    return { ...item, ...manyItem };
   }
 
   async _update(id, data) {
+    const realData = data;
+
+    // Unset any real 1:1 fields
+
+    // Update the real data
     // Avoid any kind of injection attack by explicitly doing a `$set` operation
     // Return the modified item, not the original
-    return this.model.findByIdAndUpdate(
+    const item = await this.model.findByIdAndUpdate(
       id,
-      { $set: data },
+      { $set: realData },
       { new: true, runValidators: true, context: 'query' }
     );
+
+    // For every many-field, update the many-table
+
+    return item;
   }
 
   async _delete(id) {
+    // Traverse all other lists and remove references to this item
+    // We can't just traverse our own fields, because we might have been
+    // a silent partner in a relationship, so we have know self-knowledge of it.
+    // Delete the actual item
     return this.model.findByIdAndRemove(id);
   }
 
   ////////// Queries //////////
-  _findById(id) {
+  async _findById(id) {
     return this.model.findById(id);
   }
 
-  _findAll() {
+  async _findAll() {
     return this.model.find();
   }
 
-  _find(condition) {
+  async _find(condition) {
     return this.model.find(condition);
   }
 
-  _findOne(condition) {
+  async _findOne(condition) {
     return this.model.findOne(condition);
   }
 
